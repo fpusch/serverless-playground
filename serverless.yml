@@ -1,0 +1,23 @@
+service: serverless-playground
+
+plugins:
+  - serverless-offline
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  region: eu-central-1
+  stage: ${opt:stage, 'develop'}
+  apiGateway:
+    shouldStartNameWithService: true
+
+functions:
+  main:
+    handler: dist/serverless.handler
+    events:
+      - http:
+          method: any
+          path: /
+      - http:
+          method: any
+          path: /{any+}
