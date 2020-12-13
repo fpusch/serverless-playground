@@ -1,5 +1,5 @@
 import { Server } from 'http';
-import * as express from 'express';
+import express from 'express';
 import { createApp } from './app';
 import { createServer, proxy, Response } from 'aws-serverless-express';
 
