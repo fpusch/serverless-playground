@@ -1,15 +1,41 @@
 service: serverless-playground
 
+useDotenv: true
+
+package:
+  include:
+    - dist/**.js
+  exclude:
+    - ./**.md
+    - ./**.env*
+    - ./tsconfig*.json
+    - coverage/**
+    - nest-cli.json
+    - src/**
+    - test/**
+
 plugins:
   - serverless-offline
 
 provider:
   name: aws
   runtime: nodejs12.x
-  region: eu-central-1
+  region: ${opt:region, 'eu-central-1'}
   stage: ${opt:stage, 'develop'}
   apiGateway:
     shouldStartNameWithService: true
+  environment:
+    AWS_NODEJS_CONNECTION_REUSE_ENABLED: ${env:AWS_NODEJS_CONNECTION_REUSE_ENABLED}
+  tags:
+    app:service: serverless-playground
+    app:team: felix
+  vpc:
+    securityGroupIds:
+      - sg-7d91c812
+    subnetIds:
+      - subnet-2a799c40
+      - subnet-c8bb9c85
+      - subnet-02eebe7f
 
 functions:
   main:

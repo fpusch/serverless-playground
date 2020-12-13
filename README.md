@@ -19,6 +19,9 @@ $ npm run start:dev
 
 # production mode
 $ npm run start:prod
+
+# serverless offline
+$ sls offline
 ```
 
 ## Test
@@ -32,6 +35,13 @@ $ npm run test:e2e
 
 # test coverage
 $ npm run test:cov
+```
+
+## Deploy the app
+
+```bash
+# Development
+$ sls deploy --stage=develop
 ```
 
 ## License
