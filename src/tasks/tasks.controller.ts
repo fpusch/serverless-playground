@@ -1,4 +1,12 @@
-import { Controller, Get, HttpStatus, Param, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpStatus,
+  Param,
+  Post,
+  Res,
+} from '@nestjs/common';
 import { Response } from 'express';
 import { Task } from './task.model';
 import { TasksService } from './tasks.service';
@@ -11,8 +19,8 @@ export class TasksController {
   getTasks(): Task {
     const task: Task = {
       id: 1,
-      name: 'Another task',
-      content: 'some more content.',
+      name: 'A sample task',
+      content: 'With sample content',
     };
     return task;
   }
@@ -33,5 +41,10 @@ export class TasksController {
       });
     });
     s.pipe(res);
+  }
+
+  @Post()
+  putTask(@Body() task: Task) {
+    return this.tasksService.putTask(task);
   }
 }
