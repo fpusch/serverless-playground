@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import S3 from 'aws-sdk/clients/s3';
 import { ConfigService } from '@nestjs/config';
+import { PreSignedStorageRequest } from './pre-signed-storage-request.dto';
 
 @Injectable()
 export class StorageService {
@@ -16,10 +17,17 @@ export class StorageService {
     return this.s3Client.listObjectsV2({ Bucket: bucket }).promise();
   }
 
-  fetch(bucket: string, key: string) {
-    return this.s3Client
-      .getObject({ Bucket: bucket, Key: key })
-      .createReadStream();
+  async fetchPreSignedUrl(bucket: string, key: string) {
+    const url = await this.s3Client.getSignedUrlPromise('getObject', {
+      Bucket: bucket,
+      Key: key,
+      Expires: 60,
+    });
+    const request: PreSignedStorageRequest = {
+      key: key,
+      url: url,
+    };
+    return request;
   }
 
   put(bucket: string, key: string, body: S3.Body) {

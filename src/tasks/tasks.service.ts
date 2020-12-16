@@ -18,7 +18,7 @@ export class TasksService {
   }
 
   fetchTask(key: string) {
-    return this.storage.fetch(this.tasksBucketName, key);
+    return this.storage.fetchPreSignedUrl(this.tasksBucketName, key);
   }
 
   async putTask(task: Task): Promise<TaskSavedDto> {

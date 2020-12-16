@@ -1,5 +1,6 @@
 import { ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
+import { UtilsModule } from '../utils/utils.module';
 import { TasksController } from './tasks.controller';
 import { TasksService } from './tasks.service';
 
@@ -8,7 +9,7 @@ describe('TasksController', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [ConfigModule],
+      imports: [ConfigModule, UtilsModule],
       controllers: [TasksController],
       providers: [TasksService],
     }).compile();
