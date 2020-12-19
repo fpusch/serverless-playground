@@ -1,18 +1,17 @@
 import { ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
-import { UtilsModule } from '../utils/utils.module';
-import { TasksService } from './tasks.service';
+import { S3StorageService } from './s3-storage.service';
 
-describe('TasksService', () => {
-  let service: TasksService;
+describe('S3StorageService', () => {
+  let service: S3StorageService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [ConfigModule, UtilsModule],
-      providers: [TasksService],
+      imports: [ConfigModule],
+      providers: [S3StorageService],
     }).compile();
 
-    service = module.get<TasksService>(TasksService);
+    service = module.get<S3StorageService>(S3StorageService);
   });
 
   it('should be defined', () => {

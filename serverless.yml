@@ -36,29 +36,19 @@ provider:
         - 's3:GetObject'
         - 's3:PutObject'
       Resource: 
-        - 'arn:aws:s3:::${env:S3_TASKS_BUCKET_NAME}'
-        - 'arn:aws:s3:::${env:S3_TASKS_BUCKET_NAME}/*'
+        - 'arn:aws:s3:::${env:S3_OBJECTS_BUCKET_NAME}'
+        - 'arn:aws:s3:::${env:S3_OBJECTS_BUCKET_NAME}/*'
   tags:
     app:environment: ${opt:stage, self:provider.stage}
     app:service: ${self:service}
     app:team: fpusch
-  # vpc:
-  #   securityGroupIds:
-  #     - sg-id
-  #   subnetIds:
-  #     - subnet-id
-  #     - subnet-id
-  #     - subnet-id
 
 functions:
   main:
     handler: dist/serverless.handler
     environment:
-      S3_TASKS_BUCKET_NAME: ${env:S3_TASKS_BUCKET_NAME}
+      S3_OBJECTS_BUCKET_NAME: ${env:S3_OBJECTS_BUCKET_NAME}
     events:
-      - http:
-          method: any
-          path: /
       - http:
           method: any
           path: /{any+}
