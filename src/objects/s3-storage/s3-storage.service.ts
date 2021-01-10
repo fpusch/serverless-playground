@@ -1,38 +1,63 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import S3 from 'aws-sdk/clients/s3';
+import {
+  S3Client,
+  GetObjectCommand,
+  PutObjectCommand,
+  ListObjectsV2Command,
+  HeadObjectCommand,
+} from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { v4 as uuidv4 } from 'uuid';
 import { S3PreSignedRequest } from './s3-pre-signed-request';
 
 @Injectable()
 export class S3StorageService {
-  s3Client: S3;
+  s3Client: S3Client;
 
   constructor(config: ConfigService) {
-    this.s3Client = new S3({
+    this.s3Client = new S3Client({
       region: config.get<string>('AWS_REGION') || 'eu-central-1',
     });
   }
 
   list(bucket: string) {
-    return this.s3Client.listObjectsV2({ Bucket: bucket }).promise();
+    const command = new ListObjectsV2Command({ Bucket: bucket });
+    return this.s3Client.send(command);
   }
 
   async exists(bucket: string, key: string) {
     try {
-      await this.s3Client.headObject({ Bucket: bucket, Key: key }).promise();
+      const command = new HeadObjectCommand({ Bucket: bucket, Key: key });
+      await this.s3Client.send(command);
       return true;
     } catch (error) {
       return false;
     }
   }
 
-  getPreSignedGetObjectUrl(bucket: string, key: string) {
-    return this.getPreSignedUrl('getObject', bucket, key);
+  async getPreSignedGetObjectUrl(bucket: string, key: string) {
+    const command = new GetObjectCommand({ Bucket: bucket, Key: key });
+    const url = await getSignedUrl(this.s3Client, command, { expiresIn: 60 });
+    return new S3PreSignedRequest(
+      'getObject',
+      command.input.Bucket,
+      command.input.Key,
+      60,
+      url,
+    );
   }
 
-  getPreSignedPutObjectUrl(bucket: string, key: string) {
-    return this.getPreSignedUrl('putObject', bucket, key);
+  async getPreSignedPutObjectUrl(bucket: string, key: string) {
+    const command = new PutObjectCommand({ Bucket: bucket, Key: key });
+    const url = await getSignedUrl(this.s3Client, command, { expiresIn: 60 });
+    return new S3PreSignedRequest(
+      'putObject',
+      command.input.Bucket,
+      command.input.Key,
+      60,
+      url,
+    );
   }
 
   async getPreSignedPutUniqueObjectUrl(bucket: string, keySuffix: string) {
@@ -42,26 +67,13 @@ export class S3StorageService {
       uniqueKey = `${uuidv4()}-${keySuffix}`;
       alreadyExists = await this.exists(bucket, uniqueKey);
     }
-    return this.getPreSignedUrl('putObject', bucket, uniqueKey);
-  }
-
-  private async getPreSignedUrl(
-    operation: string,
-    bucket: string,
-    key: string,
-    expires?: number,
-  ) {
-    const params = {
-      Bucket: bucket,
-      Key: key,
-      Expires: expires || 60,
-    };
-    const url = await this.s3Client.getSignedUrlPromise(operation, params);
+    const command = new PutObjectCommand({ Bucket: bucket, Key: uniqueKey });
+    const url = await getSignedUrl(this.s3Client, command, { expiresIn: 60 });
     return new S3PreSignedRequest(
-      operation,
-      params.Bucket,
-      params.Key,
-      params.Expires,
+      'putObject',
+      command.input.Bucket,
+      command.input.Key,
+      60,
       url,
     );
   }

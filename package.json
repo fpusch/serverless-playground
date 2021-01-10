@@ -26,11 +26,12 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.2.0",
+    "@aws-sdk/s3-request-presigner": "^3.2.0",
     "@nestjs/common": "^7.6.5",
     "@nestjs/config": "^0.6.1",
     "@nestjs/core": "^7.6.5",
     "@nestjs/platform-express": "^7.6.5",
-    "aws-sdk": "^2.824.0",
     "aws-serverless-express": "^3.4.0",
     "class-transformer": "^0.3.1",
     "class-validator": "^0.12.2",
