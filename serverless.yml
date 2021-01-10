@@ -38,6 +38,11 @@ provider:
       Resource: 
         - 'arn:aws:s3:::${env:S3_OBJECTS_BUCKET_NAME}'
         - 'arn:aws:s3:::${env:S3_OBJECTS_BUCKET_NAME}/*'
+    - Effect: 'Allow'
+      Action:
+        - 'sqs:SendMessage'
+      Resource:
+        - ${env:SQS_OBJECTS_QUEUE_ARN}
   tags:
     app:environment: ${opt:stage, self:provider.stage}
     app:service: ${self:service}
@@ -48,6 +53,7 @@ functions:
     handler: dist/serverless.handler
     environment:
       S3_OBJECTS_BUCKET_NAME: ${env:S3_OBJECTS_BUCKET_NAME}
+      SQS_OBJECTS_QUEUE_URL: ${env:SQS_OBJECTS_QUEUE_URL}
     events:
       - http:
           method: any
