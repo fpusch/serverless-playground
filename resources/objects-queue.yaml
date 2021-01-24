@@ -1,0 +1,6 @@
+ObjectsQueue:
+  Type: AWS::SQS::Queue
+  Properties:
+    QueueName: ${env:SQS_OBJECTS_QUEUE_NAME}
+    KmsMasterKeyId: ${env:SQS_OBJECTS_QUEUE_KMS_KEY_ID}
+    

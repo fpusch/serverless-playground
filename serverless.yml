@@ -21,7 +21,7 @@ provider:
   name: aws
   runtime: nodejs12.x
   region: ${opt:region, env:SLS_REGION}
-  stage: ${opt:stage, 'develop'}
+  stage: ${opt:stage}
   apiGateway:
     shouldStartNameWithService: true
   deploymentBucket:
@@ -36,25 +36,49 @@ provider:
         - 's3:GetObject'
         - 's3:PutObject'
       Resource: 
-        - 'arn:aws:s3:::${env:S3_OBJECTS_BUCKET_NAME}'
-        - 'arn:aws:s3:::${env:S3_OBJECTS_BUCKET_NAME}/*'
+        - ${self:custom.ObjectsBucket.arn}
+        - Fn::Join:
+          - "" 
+          - - ${self:custom.ObjectsBucket.arn}
+            - /*
     - Effect: 'Allow'
       Action:
         - 'sqs:SendMessage'
       Resource:
-        - ${env:SQS_OBJECTS_QUEUE_ARN}
+        - ${self:custom.ObjectsQueue.arn}
   tags:
     app:environment: ${opt:stage, self:provider.stage}
     app:service: ${self:service}
     app:team: fpusch
 
+custom:
+  ObjectsBucket:
+    arn:
+      Fn::GetAtt:
+        - ObjectsBucket
+        - Arn
+    name:
+      Ref: ObjectsBucket
+  ObjectsQueue:
+    arn:
+      Fn::GetAtt:
+        - ObjectsQueue
+        - Arn
+    url:
+      Ref: ObjectsQueue
+
 functions:
   main:
     handler: dist/serverless.handler
     environment:
-      S3_OBJECTS_BUCKET_NAME: ${env:S3_OBJECTS_BUCKET_NAME}
-      SQS_OBJECTS_QUEUE_URL: ${env:SQS_OBJECTS_QUEUE_URL}
+      S3_OBJECTS_BUCKET_NAME: ${self:custom.ObjectsBucket.name}
+      SQS_OBJECTS_QUEUE_URL: ${self:custom.ObjectsQueue.url}
     events:
       - http:
           method: any
           path: /{any+}
+
+resources:
+  Resources:
+    ObjectsBucket: ${file(resources/objects-bucket.yaml):ObjectsBucket}
+    ObjectsQueue: ${file(resources/objects-queue.yaml):ObjectsQueue}
