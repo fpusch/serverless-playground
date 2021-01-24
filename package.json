@@ -24,14 +24,16 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "deploy:local": "sls deploy --stage=local",
-    "deploy:develop": "sls deploy --stage=develop",
-    "deploy:production": "sls deploy --stage=production"
+    "deploy:local": "npm run build:sls && sls deploy --stage=local",
+    "deploy:develop": "npm run build:sls && sls deploy --stage=develop",
+    "deploy:production": "npm run build:sls && sls deploy --stage=production"
   },
   "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.3.0",
     "@aws-sdk/client-s3": "^3.3.0",
     "@aws-sdk/client-sqs": "^3.3.0",
     "@aws-sdk/s3-request-presigner": "^3.3.0",
+    "@aws-sdk/util-dynamodb": "^3.3.0",
     "@nestjs/common": "^7.6.5",
     "@nestjs/config": "^0.6.2",
     "@nestjs/core": "^7.6.5",

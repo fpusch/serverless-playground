@@ -1,6 +1,7 @@
 import { ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ObjectsService } from './objects.service';
+import { DomainObjectsRepository } from './repositories/domain-objects.repository';
 import { S3StorageService } from './s3-storage/s3-storage.service';
 
 describe('ObjectsService', () => {
@@ -10,7 +11,7 @@ describe('ObjectsService', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [ConfigModule],
-      providers: [ObjectsService, S3StorageService],
+      providers: [ObjectsService, S3StorageService, DomainObjectsRepository],
     }).compile();
 
     service = module.get<ObjectsService>(ObjectsService);

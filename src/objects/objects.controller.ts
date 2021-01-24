@@ -1,5 +1,6 @@
 import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
-import { CreateObjectDto } from './create-object.dto';
+import { CreateDomainObjectDto } from './models/create-domain-object.dto';
+import { CreateObjectDto } from './models/create-object.dto';
 import { ObjectsService } from './objects.service';
 
 @Controller('objects')
@@ -24,5 +25,10 @@ export class ObjectsController {
   @Post()
   createObject(@Body() createObjectDto: CreateObjectDto) {
     return this.objectsService.create(createObjectDto);
+  }
+
+  @Post('domain')
+  createDomainObject(@Body() dto: CreateDomainObjectDto) {
+    return this.objectsService.createDomainObject(dto);
   }
 }

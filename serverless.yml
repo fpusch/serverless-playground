@@ -46,6 +46,20 @@ provider:
         - 'sqs:SendMessage'
       Resource:
         - ${self:custom.ObjectsQueue.arn}
+    - Effect: 'Allow'
+      Action:
+        - 'dynamodb:BatchGetItem'
+        - 'dynamodb:BatchWriteItem'
+        - 'dynamodb:ConditionCheckItem'
+        - 'dynamodb:PutItem'
+        - 'dynamodb:DescribeTable'
+        - 'dynamodb:DeleteItem'
+        - 'dynamodb:GetItem'
+        - 'dynamodb:Scan'
+        - 'dynamodb:Query'
+        - 'dynamodb:UpdateItem'
+      Resource:
+        - ${self:custom.ObjectsTable.arn}
   tags:
     app:environment: ${opt:stage, self:provider.stage}
     app:service: ${self:service}
@@ -66,6 +80,13 @@ custom:
         - Arn
     url:
       Ref: ObjectsQueue
+  ObjectsTable:
+    arn:
+      Fn::GetAtt:
+        - ObjectsTable
+        - Arn
+    name:
+      Ref: ObjectsTable
 
 functions:
   main:
@@ -73,6 +94,7 @@ functions:
     environment:
       S3_OBJECTS_BUCKET_NAME: ${self:custom.ObjectsBucket.name}
       SQS_OBJECTS_QUEUE_URL: ${self:custom.ObjectsQueue.url}
+      DYNAMODB_OBJECTS_TABLE_NAME: ${self:custom.ObjectsTable.name}
     events:
       - http:
           method: any
@@ -82,3 +104,4 @@ resources:
   Resources:
     ObjectsBucket: ${file(resources/objects-bucket.yaml):ObjectsBucket}
     ObjectsQueue: ${file(resources/objects-queue.yaml):ObjectsQueue}
+    ObjectsTable: ${file(resources/objects-table.yaml):ObjectsTable}
